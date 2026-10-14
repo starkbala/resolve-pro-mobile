@@ -23,10 +23,19 @@ jobs:
           flutter-version: '3.24.5'
           channel: 'stable'
 
-      - name: Create Android Platform Wrapper
+      - name: Force Create Flutter Project Structure & Inject Code
         run: |
+          # Create fresh flutter project structure if missing
           flutter create --platforms=android --project-name resolve_pro_mobile .
           
+          # Ensure directories exist
+          mkdir -p lib shaders android/app/src/main
+          
+          # If main.dart was placed elsewhere or root, move it to lib/main.dart
+          if [ -f "main.dart" ]; then
+            mv main.dart lib/main.dart
+          fi
+
       - name: Get Dependencies
         run: flutter pub get
         
