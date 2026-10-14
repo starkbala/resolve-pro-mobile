@@ -22,6 +22,10 @@ jobs:
         with:
           flutter-version: '3.24.5'
           channel: 'stable'
+
+      - name: Create Android Platform Wrapper
+        run: |
+          flutter create --platforms=android --project-name resolve_pro_mobile .
           
       - name: Get Dependencies
         run: flutter pub get
