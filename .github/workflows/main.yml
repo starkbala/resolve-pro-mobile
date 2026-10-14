@@ -5,46 +5,31 @@ on:
     branches: [ "main", "master" ]
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
-  build_android_apk:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Java 17
+      - uses: actions/checkout@v4
+      
+      - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-
-      - name: Setup Flutter SDK
+          
+      - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.24.5'
           channel: 'stable'
-
-      - name: Generate Android Wrapper & Keep Custom Engine
-        run: |
-          cp pubspec.yaml pubspec.yaml.bak
-          cp lib/main.dart main.dart.bak
-          flutter create --platforms=android --project-name resolve_pro_mobile .
-          mv pubspec.yaml.bak pubspec.yaml
-          mv main.dart.bak lib/main.dart
-          sed -i 's/Icons.Games/Icons.games/g' lib/main.dart
-
-      - name: Add Gallery Permissions to AndroidManifest
-        run: |
-          sed -i 's/<application/<uses-permission android:name="android.permission.READ_MEDIA_IMAGES"\/><uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29"\/><application/' android/app/src/main/AndroidManifest.xml
-
-      - name: Install Dependencies & Compile 32-Bit GPU APK
-        run: |
-          flutter pub get
-          flutter build apk --release
-
-      - name: Upload Ready APK for Download
+          
+      - name: Get Dependencies
+        run: flutter pub get
+        
+      - name: Build APK
+        run: flutter build apk --release
+        
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: ResolvePro-Mobile-APK
